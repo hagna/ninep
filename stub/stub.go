@@ -576,7 +576,9 @@ func (s *Server) readNetPackets() {
 			s.Trace("Returned %v amt %v", b, amt)
 		}
 	}
-
+	if s.Trace != nil {
+		s.Trace("Stop readNetPackets")
+	}
 }
 
 func (s *Server) Start() {
