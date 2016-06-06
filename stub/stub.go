@@ -544,7 +544,7 @@ func (s *Server) readNetPackets() {
 		if n, err := s.FromNet.Read(l); err != nil || n < 7 {
 			log.Printf("readNetPackets: short read: %v", err)
 			s.Dead = true
-			return
+			break
 		}
 		sz := int64(l[0]) + int64(l[1])<<8 + int64(l[2])<<16 + int64(l[3])<<24
 		t := MType(l[4])

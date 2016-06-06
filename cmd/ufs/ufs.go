@@ -6,8 +6,8 @@ import (
 	"log"
 	"net"
 
-	"github.com/rminnich/ninep/filesystem"
-	"github.com/rminnich/ninep/stub"
+	"github.com/harvey-os/ninep/filesystem"
+	"github.com/harvey-os/ninep/stub"
 	"os"
 	"runtime/pprof"
 )
@@ -16,29 +16,35 @@ var (
 	ntype      = flag.String("ntype", "tcp4", "Default network type")
 	naddr      = flag.String("addr", ":5640", "Network address")
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
-	ppFile os.File
 )
 
-func profile(s string, i ...interface{}) {
-	switch s {
-	case "Starting readNetPackets":
-		// start profile
-		log.Println("START")
-		ppFile, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal(err)
+func profile(c net.Conn) func(s string, i ...interface{}) {
+	var ppFile *os.File
+	var ident string
+	ident = c.RemoteAddr().String()
+	ppFile, err := os.Create(*cpuprofile + ident)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return func(s string, i ...interface{}) {
+		switch s {
+		case "Starting readNetPackets":
+			// start profile
+			log.Println("starting profile for", ident)
+
+			pprof.StartCPUProfile(ppFile)
+		case "Stop readNetPackets":
+			//stop
+			log.Println("Writing profile", ident)
+			pprof.StopCPUProfile()
+			ppFile.Close()
 		}
-		pprof.StartCPUProfile(ppFile)
-	case "Stop readNetPackets":
-		//stop
-		log.Println("STOP!")
-		ppFile.Close()
-		pprof.StopCPUProfile()
 	}
 }
 
 func main() {
 	flag.Parse()
+	log.SetFlags(log.Lshortfile)
 	l, err := net.Listen(*ntype, *naddr)
 	if err != nil {
 		log.Fatalf("Listen failed: %v", err)
@@ -52,10 +58,10 @@ func main() {
 
 		_, err = ufs.NewUFS(func(s *stub.Server) error {
 			s.FromNet, s.ToNet = c, c
-			s.Trace = nil // log.Printf
+			s.Trace = log.Printf
 			if *cpuprofile != "" {
 
-				s.Trace = profile
+				s.Trace = profile(c)
 			}
 			return nil
 		})
