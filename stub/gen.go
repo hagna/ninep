@@ -32,7 +32,7 @@ import (
 	"reflect"
 	"text/template"
 
-	"github.com/rminnich/ninep/stub"
+	"github.com/harvey-os/ninep/stub"
 )
 
 const (

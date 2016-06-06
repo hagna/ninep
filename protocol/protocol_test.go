@@ -12,7 +12,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/rminnich/ninep/stub"
+	"github.com/harvey-os/ninep/stub"
 )
 
 var (

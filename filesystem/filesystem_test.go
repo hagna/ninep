@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rminnich/ninep/stub"
+	"github.com/harvey-os/ninep/stub"
 )
 
 func print(f string, args ...interface{}) {

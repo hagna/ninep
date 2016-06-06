@@ -6,8 +6,8 @@ import (
 	"log"
 	"net"
 
-	"github.com/rminnich/ninep/stub"
-	"github.com/rminnich/ninep/filesystem"
+	"github.com/harvey-os/ninep/stub"
+	"github.com/harvey-os/ninep/filesystem"
 )
 
 var (
